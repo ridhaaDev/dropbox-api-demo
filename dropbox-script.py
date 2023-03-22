@@ -16,11 +16,14 @@ class FilePath:
     def get_path(self):
         return self.path
     
+    def get_previous_path(self):
+        return '/'.join(self.get_path().split('/')[:-1])
+    
 def get_user_command():
     user_input = input(f"""Enter an action to take:
-Download
 Forward
 Back
+Download
 Exit
 
 Type a command like 
@@ -34,44 +37,39 @@ Command:
 
 def list_file_folders(dbx, file_path):
     result = dbx.files_list_folder(file_path)
-    files_folder_list = {}
+    files_folder_dict = {}
     
     for i, entry in enumerate(result.entries):
-        files_folder_list[i] = entry.path_display
-    return files_folder_list
+        files_folder_dict[i] = entry.path_display
+    return files_folder_dict
 
-def print_file_folder_dir(files_folder_dict):
+def print_files_and_folders(files_folder_dict):
     for key, value in files_folder_dict.items():
         print(key, value)
 
 def main():
     file_path = FilePath()
     dbx = dropbox.Dropbox(ACCESS_TOKEN)
-
-    files_folder_list = list_file_folders(dbx, file_path.get_path())
-    print_file_folder_dir(files_folder_list)
     
     while True:
+        files_folder_dict = list_file_folders(dbx, file_path.get_path())
+        print_files_and_folders(files_folder_dict)
         user_input = get_user_command()
         command_type = user_input.split(" ")[0]
+
         if command_type == "Download":
             index = int(user_input.split(" ")[1])
-            selected_folder = files_folder_list[index]
+            selected_folder = files_folder_dict[index]
             print("Selected")
             print(selected_folder)
         elif command_type == "Forward":
             index = int(user_input.split(" ")[1])
-            selected_folder = files_folder_list[index]
+            selected_folder = files_folder_dict[index]
 
             file_path.set_path(file_path.get_path() + selected_folder)
-
-            print("File path: ")
-            print(file_path.get_path())
-
-            list_folders = list_file_folders(dbx, file_path.get_path())
-
-            print("List folders: ")
-            print_file_folder_dir(list_folders)
+        elif command_type == "Back":
+            new_path = file_path.get_previous_path()
+            print("NEW_PATH", new_path)
         elif command_type == "Exit":
             break
         else:
