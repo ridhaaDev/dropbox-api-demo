@@ -1,4 +1,7 @@
 import dropbox
+from decouple import config
+
+ACCESS_TOKEN = config('ACCESS_TOKEN')
 
 import os
 script_dir = os.path.dirname(__file__)
@@ -21,7 +24,7 @@ Back
 Exit
 
 Type a command like 
-"Download 1" if you see a file to download a file
+"Download 0" if you see a file to download a file
 "Forward 1 to navigate within a folder"
 "Back" to navigate backwards
 Command: 
@@ -43,8 +46,7 @@ def print_file_folder_dir(files_folder_dict):
 
 def main():
     file_path = FilePath()
-    access_token = ''
-    dbx = dropbox.Dropbox(access_token)
+    dbx = dropbox.Dropbox(ACCESS_TOKEN)
 
     files_folder_list = list_file_folders(dbx, file_path.get_path())
     print_file_folder_dir(files_folder_list)
